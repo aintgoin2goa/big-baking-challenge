@@ -1,11 +1,23 @@
-var myStepDefinitionsWrapper = function () {
+const supertest = require('supertest');
+const app =require('../../src/app');
+const expect = require('chai').expect;
+
+module.exports =  function () {
+
+	let request;
 
 	this.When(/^a recipe is visited that cannot be found$/, function (callback) {
-		callback(null, 'pending');
+		request = supertest(app)
+			.get('/recipe/nonexistant-recipe')
+			.then(callback);
 	});
 
 	this.Then(/^the message "([^"]*)" is displayed$/, function (arg1, callback) {
-		callback(null, 'pending');
+		request
+			.expect(404)
+			.expect((res) => {
+				expect(res.body).to.equal(arg1);
+			}, callback);
 	});
 
 	this.Given(/^the system has the following recipe cooking times:$/, function (arg1, callback) {
@@ -36,4 +48,3 @@ var myStepDefinitionsWrapper = function () {
 		callback(null, 'pending');
 	});
 };
-module.exports = myStepDefinitionsWrapper;
