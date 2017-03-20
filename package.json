@@ -1,0 +1,22 @@
+{
+  "name": "big-baking-challenge",
+  "version": "1.0.0",
+  "description": "The application is a food / recipe application that will help users become better at cooking. Unfortunately the product manager has dumped a bunch of specifications on you and done a runner!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aintgoin2goa/big-baking-challenge.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aintgoin2goa/big-baking-challenge/issues"
+  },
+  "homepage": "https://github.com/aintgoin2goa/big-baking-challenge#readme",
+  "devDependencies": {
+    "cucumber": "^1.3.2"
+  }
+}
