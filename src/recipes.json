@@ -1,0 +1,10 @@
+{
+  "lemon-chicken": {
+    "Recipe": "Lemon Chicken",
+    "Cooking_Time": "30 minutes"
+  },
+  "chicken-caesar-salad": {
+    "Recipe": "Chicken Caesar Salad",
+    "Cooking_Time": "25 minutes"
+  }
+}
