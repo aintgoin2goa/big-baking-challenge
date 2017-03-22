@@ -1,3 +1,36 @@
-<h1>{{Recipe}}</h1>
+<main class="recipe">
+    <h1 class="recipe__title">{{Recipe}}</h1>
+    {{#if Image_URL}}
+        <div class="recipe__image">
+            <img src="{{Image_URL}}" alt="{{Recipe}}" />
+        </div>
+    {{/if}}
 
-<p><b>Cooking Time: </b> {{Cooking_Time}}</p>
+    <div class="recipe__info">
+        <dl>
+            {{#if Cooking_Time}}
+                <dt>Cooking Time</dt>
+                <dd>{{Cooking_Time}}</dd>
+            {{/if}}
+        </dl>
+    </div>
+
+    {{#if Ingredients}}
+        <div class="recipe__ingredients">
+            <h2 class="recipe__ingredients-title">Ingredients</h2>
+            <ul class="recipe__ingredients-list">
+                {{#each Ingredients}}
+                    <li class="recipe__ingredients-item">{{this}}</li>
+                {{/each}}
+
+            </ul>
+        </div>
+    {{/if}}
+</main>
+
+
+
+
+
+
+<h4>Ingredients</h4>
