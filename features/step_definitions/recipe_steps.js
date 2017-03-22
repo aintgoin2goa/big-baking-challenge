@@ -13,13 +13,13 @@ module.exports =  function () {
 	});
 
 	this.When(/^a recipe is visited that cannot be found$/, function (callback) {
-		request = supertest(app);
-		request = request.get('/recipes/non-existant-recipe');
+		this.request = supertest(app);
+		this.request = this.request.get('/recipes/non-existant-recipe');
 		callback();
 	});
 
 	this.Then(/^the message "([^"]*)" is displayed$/, function (arg1, callback) {
-		request
+		this.request
 			.expect(404)
 			.expect((res) => {
 				expect(res.text).to.contain(arg1);
@@ -30,7 +30,7 @@ module.exports =  function () {
 	});
 
 	this.Given(/^the system has the following recipe cooking times:$/, function (arg1, callback) {
-		fixture.writeFixture(arg1.hashes());
+		fixture.writeRecipeFixture(arg1.hashes());
 		fixture.log();
 		callback();
 	});
@@ -42,7 +42,7 @@ module.exports =  function () {
 	});
 
 	this.Then(/^the cooking time of "([^"]*)" is displayed$/, function (arg1, callback) {
-		request
+		this.request
 			.expect(200)
 			.expect(res => {
 				expect(res.text).to.contain(arg1);
@@ -51,12 +51,12 @@ module.exports =  function () {
 	});
 
 	this.Given(/^the system has the following recipe image:$/, function (arg1, callback) {
-		fixture.writeFixture(arg1.hashes());
+		fixture.writeRecipeFixture(arg1.hashes());
 		callback();
 	});
 
 	this.Then(/^the image "([^"]*)" is displayed$/, function (arg1, callback) {
-		request
+		this.request
 			.expect(200)
 			.expect(res => {
 				expect(res.text).to.contain(arg1);
@@ -68,13 +68,13 @@ module.exports =  function () {
 		const ingredients = arg1.rows().map(row => {
 			return {quantity: row[1], ingredient:row[2]};
 		});
-		fixture.writeFixture([{Recipe:'Lemon Chicken', Ingredients:ingredients}]);
+		fixture.writeRecipeFixture([{Recipe:'Lemon Chicken', Ingredients:ingredients}]);
 		callback();
 	});
 
 	this.Then(/^the ingredients are listed:$/, function (arg1, callback) {
 		const ingredients = flatten(arg1.raw());
-		request
+		this.request
 			.expect(200)
 			.expect(res => {
 				for(let ingredient of ingredients){

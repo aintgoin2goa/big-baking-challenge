@@ -25,6 +25,21 @@ function loadData(){
 
 const PORT = Number(process.env.PORT || '3003');
 
+app.get('/recipes', (req, res) => {
+	loadData()
+		.then(data => {
+			if(!data || !Object.keys(data).length){
+				return void res.status(404).send('Sorry, we currently have no recipes for you');
+			}
+
+			//Could use Immutable here but this assumes the data is Immutable
+			const recipes = Object.keys(data).map(key => Object.assign({}, data[key], {slug:key}));
+			res.render('list', {recipes});
+
+			// obv I wouldn't do this in production...
+		}).catch(err => res.status(500).send(err.stack))
+});
+
 app.get('/recipes/:recipe', (req, res) => {
 	loadData()
 		.then(data => {
@@ -34,7 +49,7 @@ app.get('/recipes/:recipe', (req, res) => {
 				return void res.status(404).send(`Sorry, this recipe doesn't exist or may have been removed`);
 			}
 
-			//
+			//Using immutable here as I've been burned a lot by not using it
 			let recipe = Immutable.fromJS(recipeData);
 			if(recipe.has('Ingredients')){
 				recipe = recipe.set('Ingredients', recipe.get('Ingredients')
@@ -47,9 +62,13 @@ app.get('/recipes/:recipe', (req, res) => {
 				);
 			}
 
+			// The fixtures in the test are annoyingly inconsistent
+			if(recipe.has('Name')){
+				recipe = recipe.set('Recipe', recipe.get('Name'));
+			}
+
 			res.render('recipe', recipe.toJS());
 		}).catch(err => {
-			console.error(err.stack);
 			res.status(500).send(err.stack);
 	});
 });

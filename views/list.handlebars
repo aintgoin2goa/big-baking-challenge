@@ -1,0 +1,26 @@
+<main class="recipe-list">
+    <h1>All Recipes</h1>
+    <table class="recipe-list__table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Cooking Time</th>
+            <th>Main Ingredients</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each recipes}}
+            <tr class="recipe-list__item">
+                <td class="recipe-list__item-name"><a href="/recipes/{{slug}}">{{Name}}</a></td>
+                <td>{{Cooking_Time}}</td>
+                <td>{{Main_Ingredients}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+
+    </table>
+</main>
+
+
+
+
