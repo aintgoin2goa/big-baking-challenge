@@ -14,13 +14,12 @@ module.exports =  function () {
 
 	this.When(/^a recipe is visited that cannot be found$/, function (callback) {
 		this.request = supertest(app);
-		this.request = this.request.get('/recipes/non-existant-recipe');
+		this.request = this.request.get('/recipes/non-existant-recipe').expect(404);
 		callback();
 	});
 
 	this.Then(/^the message "([^"]*)" is displayed$/, function (arg1, callback) {
 		this.request
-			.expect(404)
 			.expect((res) => {
 				expect(res.text).to.contain(arg1);
 			})

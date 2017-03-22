@@ -37,7 +37,24 @@ app.get('/recipes', (req, res) => {
 			//Could use Immutable here but this assumes the data is Immutable
 			const viewData = {};
 			viewData.recipes = Object.keys(data).map(key => Object.assign({}, data[key], {slug:key}));
+
+			if(req.query.filter){
+				const filterRegex = new RegExp(req.query.filter, 'i');
+				viewData.recipes = viewData.recipes
+					.filter(r => filterRegex.test(r.Name) || filterRegex.test(r.Ingredients));
+			}
+
+			if(req.query.maxCookingTime){
+				const maxTime = parseInt(req.query.maxCookingTime,10);
+				viewData.recipes = viewData.recipes.filter(r => parseInt(r.Cooking_Time,10) <= maxTime);
+			}
+
 			const totalRecipeCount = viewData.recipes.length;
+
+			if(totalRecipeCount === 0){
+				return void res.status(404).send('Sorry, nothing matched your filter term');
+			}
+
 			if(totalRecipeCount > itemsPerPage){
 				const startIndex = itemsPerPage * (page-1);
 				const endIndex = startIndex + itemsPerPage;

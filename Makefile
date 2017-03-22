@@ -1,7 +1,7 @@
 .PHONY: test
 
 test:
-	./node_modules/.bin/cucumber.js features/recipe_list.feature
+	./node_modules/.bin/cucumber.js features/filter_recipes.feature
 
 run:
 	node src/app.js
