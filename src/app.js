@@ -26,6 +26,8 @@ function loadData(){
 const PORT = Number(process.env.PORT || '3003');
 
 app.get('/recipes', (req, res) => {
+	const page = Number(req.query.page || '1');
+	const itemsPerPage = 10;
 	loadData()
 		.then(data => {
 			if(!data || !Object.keys(data).length){
@@ -33,10 +35,24 @@ app.get('/recipes', (req, res) => {
 			}
 
 			//Could use Immutable here but this assumes the data is Immutable
-			const recipes = Object.keys(data).map(key => Object.assign({}, data[key], {slug:key}));
-			res.render('list', {recipes});
+			const viewData = {};
+			viewData.recipes = Object.keys(data).map(key => Object.assign({}, data[key], {slug:key}));
+			const totalRecipeCount = viewData.recipes.length;
+			if(totalRecipeCount > itemsPerPage){
+				const startIndex = itemsPerPage * (page-1);
+				const endIndex = startIndex + itemsPerPage;
+				viewData.recipes = viewData.recipes.slice(startIndex, endIndex);
+				viewData.pagination = {
+					currentPage: page,
+					totalPages: Math.ceil(totalRecipeCount / itemsPerPage)
+				}
+			}
+
+			console.log('viewdata', viewData);
+			res.render('list', viewData);
 
 			// obv I wouldn't do this in production...
+			// would use some kind of error service like sentry or something
 		}).catch(err => res.status(500).send(err.stack))
 });
 

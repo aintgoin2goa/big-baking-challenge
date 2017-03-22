@@ -30,14 +30,15 @@ exports.writeListFixture = rows => {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
 };
 
-exports.defaultList = () => {
-	const data = {
-		'lemon-chicken': {
+exports.defaultList = (count = 1) => {
+	const data = {};
+	for(let i=0; i<count; i++){
+		data['recipe-' + i] = {
 			Name: 'Lemon Chicken',
 			Cooking_Time: '30 minutes',
 			Main_Ingredients: 'Chicken, Lemon'
 		}
-	};
+	}
 
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
 };

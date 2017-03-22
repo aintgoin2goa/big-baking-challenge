@@ -73,18 +73,32 @@ module.exports = function () {
 	});
 
 	this.Then(/^the recipes along with their cooking time and main ingredients are displayed:$/, function (arg1, callback) {
-		callback(null, 'pending');
+		const recipes = flatten(arg1.raw());
+		this.request.expect(res => {
+			for(let recipe of recipes){
+				expect(res.text).to.contain(recipe);
+			}
+		}).expect(200, callback);
 	});
 
 	this.When(/^there are more than (\d+) recipes in the system$/, function (arg1, callback) {
-		callback(null, 'pending');
+		fixture.defaultList(parseInt(arg1,10)+1);
+		this.request = supertest(app).get('/recipes');
+		callback();
 	});
 
 	this.Then(/^only the first (\d+) recipes are shown$/, function (arg1, callback) {
-		callback(null, 'pending');
+		this.request
+			.expect(res => {
+				const $ = cheerio.load(res.text);
+				expect($('.recipe-list__item').length).to.equal(parseInt(arg1,10));
+			});
+		callback();
 	});
 
-	this.Then(/^page navigation elements are displayed$/, function (arg1, callback) {
-		callback(null, 'pending');
+	this.Then(/^page navigation elements are displayed$/, function (callback) {
+		this.request.expect(res => {
+			expect(res.text).to.contain('recipe-list__pagination');
+		}).end(callback);
 	});
 };

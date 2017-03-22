@@ -7,4 +7,4 @@ run:
 	node src/app.js
 
 fixture:
-	node -e 'require("./features/support/fixture.js").defaultList()'
+	node -e 'require("./features/support/fixture.js").defaultList(42)'

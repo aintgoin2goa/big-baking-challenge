@@ -19,6 +19,12 @@
         </tbody>
 
     </table>
+
+    {{#with pagination}}
+        <div class="recipe-list__pagination">
+            <p>Page {{currentPage}} of {{totalPages}}</p>
+        </div>
+    {{/with}}
 </main>
 
 
