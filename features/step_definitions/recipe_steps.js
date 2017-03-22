@@ -36,7 +36,7 @@ module.exports =  function () {
 
 	this.When(/^the "([^"]*)" recipe is visited$/, function (arg1, callback) {
 		const slug = arg1.toLowerCase().replace(/\s/g, '-');
-		request = supertest(app).get(`/recipes/${slug}`);
+		this.request = supertest(app).get(`/recipes/${slug}`);
 		callback();
 	});
 

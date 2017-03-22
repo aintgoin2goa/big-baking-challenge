@@ -3,6 +3,7 @@ const fs = require('fs');
 const flatten = require('lodash.flatten');
 
 const DATA_FILE = resolvePath(__dirname, '../../src/recipes.json');
+const USERS_FILE = resolvePath(__dirname, '../../src/users.json');
 
 exports.writeRecipeFixture = rows => {
 	const data = {};
@@ -43,8 +44,22 @@ exports.defaultList = (count = 1) => {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
 };
 
+exports.user = name => {
+	const data = {
+		[name] : {Name: name, Starred:[]},
+	};
+	fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
+};
+
+exports.starredRecipes = (name, recipes) => {
+	const users = JSON.parse(fs.readFileSync(USERS_FILE, {encoding:'utf8'}));
+	users[name] = {Name:name, Starred:recipes};
+	fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), {encoding:'utf8'});
+};
+
 exports.tearDown = () => {
 	fs.writeFileSync(DATA_FILE, '{}', {encoding:'utf8'});
+	fs.writeFileSync(USERS_FILE, '{}', {encoding:'utf8'});
 };
 
 exports.log = () => {

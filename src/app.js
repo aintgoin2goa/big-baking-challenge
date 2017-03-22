@@ -3,11 +3,15 @@ const handlebars = require('express-handlebars');
 const fs = require('fs');
 const resolvePath = require('path').resolve;
 const Immutable = require('immutable');
+const bodyParser = require('body-parser');
 
 const app = express();
 
 app.engine('handlebars', handlebars({defaultLayout: 'layout'}));
 app.set('view engine', 'handlebars');
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 // Wouldn't be loading the data on each request in the real world, more likely querying a database
 // or if the dataset was small we could poll it instead
@@ -23,7 +27,39 @@ function loadData(){
 	})
 }
 
+function loadUsers(){
+	return new Promise((resolve, reject) => {
+		fs.readFile(resolvePath(__dirname, './users.json'), {encoding:'utf8'}, (err, data) => {
+			if(err){
+				return void reject(err);
+			}
+
+			data = JSON.parse(data);
+			return void resolve(data);
+		})
+	})
+}
+
+function saveUsers(users){
+	return new Promise((resolve, reject) => {
+		fs.writeFile(
+			resolvePath(__dirname, './users.json'),
+			JSON.stringify(users, null, 2),
+			{encoding:'utf8'},
+			(err) => {
+				if(err){
+					return void reject(err);
+				}
+
+				return void resolve();
+			}
+		)
+	});
+}
+
 const PORT = Number(process.env.PORT || '3003');
+
+
 
 app.get('/recipes', (req, res) => {
 	const page = Number(req.query.page || '1');
@@ -65,7 +101,6 @@ app.get('/recipes', (req, res) => {
 				}
 			}
 
-			console.log('viewdata', viewData);
 			res.render('list', viewData);
 
 			// obv I wouldn't do this in production...
@@ -104,6 +139,40 @@ app.get('/recipes/:recipe', (req, res) => {
 		}).catch(err => {
 			res.status(500).send(err.stack);
 	});
+});
+
+app.get('/users/:user/starred', (req, res) => {
+	loadUsers()
+		.then(users => {
+
+			const user = users[req.params.user];
+			console.log(typeof users);
+			if(!user){
+				return void res.status(404).send('User not found');
+			}
+
+			res.json(user);
+		}).catch(err => {
+		res.status(500).send(err.stack);
+	});
+});
+
+app.post('/users/:user/starred', (req, res) => {
+	const recipe = req.body.recipe;
+	loadUsers()
+		.then(users => {
+			const user = users[req.params.user];
+			if(!user){
+				return void res.status(401).send('No user');
+			}
+
+			user.Starred.push(recipe);
+			users[req.params.user] = user;
+			return saveUsers(users)
+		})
+		.then(() => {
+			res.status(200).send('Saved');
+		})
 });
 
 module.exports = app;
