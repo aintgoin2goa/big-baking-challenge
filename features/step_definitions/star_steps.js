@@ -36,22 +36,39 @@ module.exports = function () {
 	});
 
 	this.Given(/^he has the starred recipes:$/, function (arg1, callback) {
-		callback(null, 'pending');
+		fixture.starredRecipes(this.user, flatten(arg1.raw()));
+		callback();
 	});
 
 	this.When(/^he unstars the recipe "([^"]*)"$/, function (arg1, callback) {
-		callback(null, 'pending');
+		const recipeSlug = arg1.toLowerCase().replace(/\s/g, '-');
+		this.request = supertest(app)
+			.delete(`/users/${this.user}/starred/${recipeSlug}`)
+			.end(callback);
 	});
 
 	this.Then(/^the system has no starred recipes for "([^"]*)"$/, function (arg1, callback) {
-		callback(null, 'pending');
+		this.request = supertest(app)
+			.get(`/users/${this.user}/starred`)
+			.expect(200)
+			.expect(res => {
+				expect(res.body.Starred).to.be.empty;
+			}).end(callback);
 	});
 
 	this.When(/^he filters by starred recipes$/, function (callback) {
-		callback(null, 'pending');
+		this.request = supertest(app)
+			.get('/recipes/starred')
+			.set('Cookie', 'user=' + this.user)
+		callback();
 	});
 
 	this.Then(/^the recipe "([^"]*)" is displayed$/, function (arg1, callback) {
-		callback(null, 'pending');
+		this.request
+			.expect(200)
+			.expect(res => {
+				expect(res.text).to.contain(arg1);
+			})
+			.end(callback)
 	});
 };

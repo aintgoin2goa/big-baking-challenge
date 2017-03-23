@@ -4,6 +4,7 @@ const fs = require('fs');
 const resolvePath = require('path').resolve;
 const Immutable = require('immutable');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.set('view engine', 'handlebars');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Wouldn't be loading the data on each request in the real world, more likely querying a database
 // or if the dataset was small we could poll it instead
@@ -59,8 +61,6 @@ function saveUsers(users){
 
 const PORT = Number(process.env.PORT || '3003');
 
-
-
 app.get('/recipes', (req, res) => {
 	const page = Number(req.query.page || '1');
 	const itemsPerPage = 10;
@@ -106,6 +106,30 @@ app.get('/recipes', (req, res) => {
 			// obv I wouldn't do this in production...
 			// would use some kind of error service like sentry or something
 		}).catch(err => res.status(500).send(err.stack))
+});
+
+app.get('/recipes/starred/', (req, res) => {
+	// Getting the user from a cookie here just to show a different approach
+	// In the real world would ideally parse the cookie string into headers at the CDN level
+	// and have a "vary: user" header or something
+	const userName = req.cookies.user;
+	Promise.all([
+		loadData(),
+		loadUsers()
+	])
+		.then(([data, users]) => {
+			const user = users[userName];
+			if(!user){
+				return void res.status(401).send('No User');
+			}
+
+			const starredRecipes = Object.keys(data).map(k => data[k]).filter(r => user.Starred.includes(r.Name));
+			if(!starredRecipes.length){
+				return void res.status(200).send("Sorry, you don't currently have any starred recipes, get started by starring recipes you like");
+			}
+
+			res.render('list', {recipes:starredRecipes});
+		})
 });
 
 app.get('/recipes/:recipe', (req, res) => {
@@ -172,6 +196,29 @@ app.post('/users/:user/starred', (req, res) => {
 		})
 		.then(() => {
 			res.status(200).send('Saved');
+		})
+});
+
+app.delete('/users/:user/starred/:recipe', (req, res) => {
+	const recipe = req.params.recipe.replace('-', ' ');
+	loadUsers()
+		.then(users => {
+			const user = users[req.params.user];
+			if(!user){
+				return void res.status(401).send('No user');
+			}
+
+			const index = user.Starred.findIndex(s => s.toLowerCase() === recipe);
+			if(index < 0){
+				return void res.status(200).send('Recipe not starred');
+			}
+
+			user.Starred.splice(index,1);
+			users[req.params.user] = user;
+			return saveUsers(users)
+		})
+		.then(() => {
+			res.status(200).send('Deleted');
 		})
 });
 
