@@ -31,7 +31,7 @@ exports.writeListFixture = rows => {
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
 };
 
-exports.defaultList = (count = 1) => {
+function defaultList(count = 1) {
 	const data = {};
 	for(let i=0; i<count; i++){
 		data['recipe-' + i] = {
@@ -42,7 +42,9 @@ exports.defaultList = (count = 1) => {
 	}
 
 	fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
-};
+}
+
+exports.defaultList = defaultList;
 
 exports.user = name => {
 	const data = {
@@ -51,11 +53,13 @@ exports.user = name => {
 	fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2), {encoding:'utf8'});
 };
 
-exports.starredRecipes = (name, recipes) => {
+function starredRecipes(name, recipes) {
 	const users = JSON.parse(fs.readFileSync(USERS_FILE, {encoding:'utf8'}));
 	users[name] = {Name:name, Starred:recipes};
 	fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), {encoding:'utf8'});
-};
+}
+
+exports.starredRecipes = starredRecipes;
 
 exports.tearDown = () => {
 	fs.writeFileSync(DATA_FILE, '{}', {encoding:'utf8'});
@@ -64,4 +68,9 @@ exports.tearDown = () => {
 
 exports.log = () => {
 	console.dir(JSON.parse(fs.readFileSync(DATA_FILE, {encoding:'utf8'})), {depth:null});
+};
+
+exports.setup = () => {
+	defaultList(42);
+	starredRecipes('Joe', []);
 };

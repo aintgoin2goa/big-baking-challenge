@@ -6,5 +6,5 @@ test:
 run:
 	node src/app.js
 
-fixture:
-	node -e 'require("./features/support/fixture.js").defaultList(42)'
+setup:
+	node -e 'require("./features/support/fixture.js").setup()'
